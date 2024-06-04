@@ -100,7 +100,8 @@ class Residual_block(nn.Module):
         h = h + part_t
         
         h = self.conv_layer(h)
-        h = self.S41(h.permute(2,0,1)).permute(1,2,0)     
+        h = self.S41(h.permute(2,0,1)).permute(1,2,0)   
+        # h = self.mamba1(h.permute(0,2,1)).permute(0,2,1)   
         
         # # process label embedding
         # if(self.fc_label is not None):
@@ -108,6 +109,7 @@ class Residual_block(nn.Module):
         #     h = h + label_embed
 
         h = self.S42(h.permute(2,0,1)).permute(1,2,0)
+        # h = self.mamba2(h.permute(0,2,1)).permute(0,2,1)
         
         out = torch.tanh(h[:,:self.res_channels,:]) * torch.sigmoid(h[:,self.res_channels:,:])
 
