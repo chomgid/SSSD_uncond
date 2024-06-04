@@ -4,7 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from utils.util import calc_diffusion_step_embedding
 from models.S4Model import S4Layer
-
+from mamba_ssm.modules.mamba_simple import Mamba
+from mamba_ssm.modules.mamba2 import Mamba2
+from mamba_ssm.modules.mamba2_simple import Mamba2Simple
 
 def swish(x):
     return x * torch.sigmoid(x)
@@ -57,6 +59,10 @@ class Residual_block(nn.Module):
                           bidirectional=s4_bidirectional,
                           layer_norm=s4_layernorm)
  
+        self.mamba1 = Mamba(d_model=512)
+        # self.mamba1 = Mamba2(d_model=512)
+        # self.mamba1 = Mamba2Simple(d_model=512)
+
         self.conv_layer = Conv(self.res_channels, 2 * self.res_channels, kernel_size=3)
 
         self.S42 = S4Layer(features=2*self.res_channels, 
@@ -66,6 +72,10 @@ class Residual_block(nn.Module):
                           bidirectional=s4_bidirectional,
                           layer_norm=s4_layernorm)
         
+        self.mamba2 = Mamba(d_model=512)
+        # self.mamba2 = Mamba2(d_model=512)
+        # self.mamba2 = Mamba2Simple(d_model=512)
+
         self.res_conv = nn.Conv1d(res_channels, res_channels, kernel_size=1)
         self.res_conv = nn.utils.weight_norm(self.res_conv)
         nn.init.kaiming_normal_(self.res_conv.weight)
